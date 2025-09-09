@@ -365,6 +365,7 @@
         let timeoutId = null;
         let keyListenerActive = false;
         let totalRounds = 20; // Configurable number of rounds
+        let buttonHistory = []; // Track last buttons to prevent 3+ in a row
         
         // Statistics
         let correctPresses = 0;
@@ -488,6 +489,7 @@
             sessionActive = false;
             keyListenerActive = false;
             currentRound = 0;
+            buttonHistory = []; // Clear button history
             
             // Hide cancel button
             document.getElementById('cancelBtn').style.display = 'none';
@@ -507,8 +509,27 @@
             
             resetButtons();
             
-            // Select random button
-            targetButton = Math.floor(Math.random() * 12) + 1;
+            // Select random button with constraint: no more than 2 in a row
+            let attempts = 0;
+            const maxAttempts = 100; // Prevent infinite loop
+            
+            do {
+                targetButton = Math.floor(Math.random() * 12) + 1;
+                attempts++;
+                
+                // Check if this would be the third in a row
+                if (buttonHistory.length >= 2) {
+                    const lastTwo = buttonHistory.slice(-2);
+                    if (lastTwo[0] === targetButton && lastTwo[1] === targetButton) {
+                        // This would be third in a row, try again
+                        continue;
+                    }
+                }
+                break; // Valid button found
+            } while (attempts < maxAttempts);
+            
+            // Add to history and track stats
+            buttonHistory.push(targetButton);
             buttonStats[targetButton].attempts++;
             
             // Highlight target button
