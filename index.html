@@ -189,6 +189,7 @@
             transition: all 0.3s ease;
             font-weight: bold;
             text-transform: uppercase;
+            line-height: 1.4;
         }
 
         .start-btn:hover, .restart-btn:hover, .menu-btn:hover, .cancel-btn:hover {
@@ -203,6 +204,14 @@
 
         .cancel-btn:hover {
             box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
+        }
+
+        .space-hint {
+            font-size: 0.8em;
+            opacity: 0.8;
+            font-weight: normal;
+            display: block;
+            margin-top: 5px;
         }
 
         .results-screen h2 {
@@ -252,6 +261,11 @@
             text-align: center;
         }
 
+        .button-stat.not-tested {
+            opacity: 0.4;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
         .button-stat-number {
             font-size: 0.9em;
             color: #aaa;
@@ -266,6 +280,7 @@
         .accuracy-good { color: #4caf50; }
         .accuracy-medium { color: #ff9800; }
         .accuracy-poor { color: #f44336; }
+        .accuracy-none { color: #666; }
 
         .instructions {
             text-align: center;
@@ -310,7 +325,10 @@
                 <div class="mouse-button inactive" data-button="11">11</div>
                 <div class="mouse-button inactive" data-button="12">12</div>
             </div>
-            <button class="start-btn" id="startBtn" onclick="startSession()">Start Training</button>
+            <button class="start-btn" id="startBtn" onclick="startSession()">
+                Start Training
+                <span class="space-hint">Press SPACE to begin</span>
+            </button>
             <button class="cancel-btn" id="cancelBtn" style="display: none;" onclick="cancelSession()">Cancel Session</button>
         </div>
 
@@ -628,6 +646,21 @@
         
         // Keyboard event listener
         document.addEventListener('keydown', (event) => {
+            // Handle spacebar to start session
+            if (event.key === ' ' || event.key === 'Spacebar') {
+                const startBtn = document.getElementById('startBtn');
+                const trainingScreen = document.querySelector('.training-screen');
+                
+                // Check if we're on training screen and start button is visible
+                if (trainingScreen.classList.contains('active') && 
+                    startBtn && startBtn.style.display !== 'none') {
+                    event.preventDefault(); // Prevent page scroll
+                    startSession();
+                    return;
+                }
+            }
+            
+            // Handle game input
             if (!sessionActive || !keyListenerActive) return;
             
             const key = event.key;
