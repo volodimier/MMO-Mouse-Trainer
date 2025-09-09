@@ -587,19 +587,34 @@
             
             for (let i = 1; i <= 12; i++) {
                 const stat = buttonStats[i];
-                const buttonAccuracy = stat.attempts > 0 
-                    ? (stat.correct / stat.attempts * 100).toFixed(0)
-                    : 0;
+                let buttonAccuracy;
+                let accuracyClass;
+                let accuracyText;
                 
-                const accuracyClass = buttonAccuracy >= 80 ? 'accuracy-good' 
-                    : buttonAccuracy >= 50 ? 'accuracy-medium' 
-                    : 'accuracy-poor';
+                if (stat.attempts === 0) {
+                    // Button was never tested
+                    buttonAccuracy = -1;
+                    accuracyClass = 'accuracy-none';
+                    accuracyText = '—';
+                } else {
+                    // Button was tested at least once
+                    buttonAccuracy = (stat.correct / stat.attempts * 100).toFixed(0);
+                    accuracyText = `${buttonAccuracy}%`;
+                    
+                    if (buttonAccuracy >= 80) {
+                        accuracyClass = 'accuracy-good';
+                    } else if (buttonAccuracy >= 50) {
+                        accuracyClass = 'accuracy-medium';
+                    } else {
+                        accuracyClass = 'accuracy-poor';
+                    }
+                }
                 
                 const statDiv = document.createElement('div');
-                statDiv.className = 'button-stat';
+                statDiv.className = stat.attempts === 0 ? 'button-stat not-tested' : 'button-stat';
                 statDiv.innerHTML = `
                     <div class="button-stat-number">Button ${i}</div>
-                    <div class="button-stat-accuracy ${accuracyClass}">${buttonAccuracy}%</div>
+                    <div class="button-stat-accuracy ${accuracyClass}">${accuracyText}</div>
                 `;
                 buttonStatsContainer.appendChild(statDiv);
             }
